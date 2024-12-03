@@ -1,0 +1,243 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Title Override Tests</title>
+        <style>
+            * {
+                box-sizing: border-box;
+            }
+
+            body {
+                font-family: Arial, sans-serif;
+                margin: 0;
+                padding: 20px;
+                display: flex;
+                gap: 20px;
+                height: 100vh;
+                overflow: hidden;
+            }
+
+            #resultsSection {
+                flex-grow: 1;
+                height: 95vh;
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+                box-shadow: 0 0 4px hsl(0, 0%, 80%);
+                padding: 20px;
+                border-radius: 8px;
+            }
+
+            #testResults {
+                height: 85vh;
+                width: 100%;
+                overflow-y: auto;
+            }
+
+            #progressBar {
+                font-family: monospace;
+                background-color: hsl(0, 0%, 27%);
+                color: hsl(51, 100%, 50%);
+                padding: 8px 10px;
+                height: 28px;
+                border-radius: 3px;
+                font-weight: bold;
+                position: relative;
+                overflow: hidden;
+            }
+
+            #progressBar::before {
+                content: "";
+                position: absolute;
+                left: 0;
+                top: 0;
+                height: 100%;
+                background-color: hsl(0, 0%, 40%);
+                transition: width 0.2s;
+                z-index: 1;
+                width: var(--progress, 0%);
+            }
+
+            #progressBar > span {
+                position: relative;
+                z-index: 2;
+            }
+
+            #buttonContainer {
+                display: flex;
+                gap: 10px;
+            }
+
+            #exportButton,
+            #clearButton {
+                padding: 8px 16px;
+                background-color: hsl(120, 39%, 47%);
+                color: hsl(0, 0%, 100%);
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                font-size: 14px;
+                margin-right: 10px;
+            }
+
+            #clearButton {
+                background-color: hsl(0, 68%, 57%);
+            }
+
+            #exportButton:hover {
+                background-color: hsl(120, 39%, 40%);
+            }
+
+            #clearButton:hover {
+                background-color: hsl(0, 74%, 45%);
+            }
+
+            #controlPanel {
+                flex-grow: 0;
+                background: hsl(0, 0%, 96%);
+                padding: 15px;
+                border-top-left-radius: 8px;
+                border-bottom-left-radius: 8px;
+                box-shadow: 0 2px 4px hsl(0, 0%, 88%);
+                box-sizing: border-box;
+                display: flex;
+                flex-direction: column;
+                height: 83vh;
+                overflow-y: auto;
+                width: 250px;
+            }
+
+            #controlPanel button {
+                width: 100%;
+                padding: 10px;
+                margin-bottom: 15px;
+                border-radius: 4px;
+                border: none;
+                cursor: pointer;
+                font-size: 14px;
+                background-color: hsl(120, 0%, 90%);
+            }
+
+            #controlPanel button:hover {
+                background-color: hsl(120, 0%, 88%);
+            }
+
+            #controlPanel button#runAllTests {
+                background-color: hsl(120, 39%, 47%);
+                color: hsl(0, 0%, 100%);
+                font-size: 16px;
+            }
+
+            #controlPanel button#runAllTests:hover {
+                background-color: hsl(120, 39%, 45%);
+            }
+
+            #iframeContainer {
+                width: 250px;
+                height: 100px;
+                border: 2px solid hsl(0, 0%, 80%);
+                border-radius: 4px;
+                margin-bottom: 15px;
+                overflow: hidden;
+            }
+
+            #iframeContainer > iframe {
+                border: 2px solid hsl(0, 0%, 100%);
+                border-radius: 4px;
+            }
+
+            /* Table styles */
+            #resultsTable {
+                table-layout: auto;
+                width: 100%;
+            }
+
+            #resultsTable thead {
+                background-color: hsl(0, 0%, 95%);
+                position: sticky;
+                top: 0;
+                z-index: 1;
+            }
+
+            #resultsTable th,
+            #resultsTable td {
+                word-wrap: break-word;
+                overflow-wrap: break-word;
+                white-space: normal;
+                padding: 8px;
+            }
+
+            /* Ensure the timing information stays formatted */
+            #resultsTable td:last-child {
+                white-space: pre-line;
+            }
+
+            #resultsTable tr.test-header {
+                background-color: hsl(210, 25%, 20%);
+                color: hsl(0, 0%, 100%);
+                font-weight: bold;
+            }
+
+            #resultsTable tr.test-header td {
+                padding: 15px;
+                font-size: 1.2em;
+                text-transform: uppercase;
+            }
+
+            #resultsTable tr.active-test {
+                background-color: hsl(210, 72%, 93%);
+            }
+
+            #resultsTable tr.inactive-test {
+                background-color: hsl(120, 39%, 93%);
+            }
+
+            #resultsTable tr.active-test.fail {
+                background-color: hsl(0, 78%, 90%);
+            }
+
+            #resultsTable tr.inactive-test.fail {
+                background-color: hsl(0, 78%, 85%);
+            }
+
+            #resultsTable tr.active-test.pass {
+                background-color: hsl(210, 72%, 88%);
+            }
+
+            #resultsTable tr.inactive-test.pass {
+                background-color: hsl(120, 39%, 88%);
+            }
+
+            .empty-string {
+                color: hsl(0, 0%, 60%);
+                font-style: italic;
+            }
+
+            td:last-child {
+                white-space: pre-line;
+                font-family: monospace;
+                font-size: 0.9em;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="resultsSection">
+            <div id="progressBar">
+                <span>[0/0]</span>
+            </div>
+            <div id="buttonContainer">
+                <button id="exportButton">Export Results</button>
+                <button id="clearButton">Clear Results</button>
+            </div>
+            <div id="testResults"></div>
+        </div>
+        <div>
+            <div id="iframeContainer"></div>
+            <div id="controlPanel">
+                <button id="runAllTests">Run All Tests</button>
+                <div id="testGroups"></div>
+            </div>
+        </div>
+        <script src="tests.js" type="module"></script>
+    </body>
+</html>

@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Custom Tab Title</title>
+        <style>
+            :root {
+                --main-color: hsl(193, 100%, 41%);
+                --secondary-color: hsl(0, 0%, 20%);
+                --tertiary-color: lightgray;
+            }
+
+            body {
+                font-family: Arial, sans-serif;
+                color: var(--secondary-color);
+                background-color: hsl(0, 0%, 96%);
+                width: 310px;
+                margin: 0;
+                padding: 15px;
+                box-sizing: border-box;
+                user-select: none;
+                display: flex;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            #warning {
+                background-color: hsl(0, 75%, 98%);
+                color: hsl(0, 50%, 30%);
+                border: 2px solid hsl(0, 75%, 80%);
+                border-radius: 6px;
+                padding: 10px;
+                font-size: 14px;
+                font-weight: bold;
+                text-align: center;
+                box-shadow: 0 2px 4px hsla(0, 0%, 0%, 0.1);
+                display: none;
+            }
+
+            input,
+            button,
+            label {
+                font-size: 14px;
+                font-weight: 500;
+                color: var(--secondary-color);
+                border-radius: 4px;
+                box-sizing: border-box;
+            }
+
+            input:focus,
+            button:focus,
+            a:focus {
+                outline: 2px solid black;
+            }
+
+            #customTitleWrapper label {
+                display: flex;
+                padding: 5px 0 10px 5px;
+            }
+
+            input[type="text"] {
+                background-color: white;
+                padding: 8px;
+                border: 2px solid var(--tertiary-color);
+                margin-right: 10px;
+                transition:
+                    box-shadow 0.2s ease,
+                    outline 0.03s ease;
+            }
+
+            input[type="checkbox"] {
+                position: absolute;
+                height: 0;
+                width: 0;
+            }
+
+            input[type="checkbox"] + label {
+                position: relative;
+                cursor: pointer;
+                display: inline-flex;
+            }
+
+            input[type="checkbox"] + label::before {
+                content: "";
+                margin-right: 10px;
+                width: 16px;
+                height: 16px;
+                background-color: white;
+                border: 2px solid var(--tertiary-color);
+                border-radius: 2px;
+                box-shadow: none;
+                transition: outline 0.03s ease;
+            }
+
+            input[type="checkbox"]:focus + label::before {
+                outline: 2px solid black;
+            }
+
+            input[type="checkbox"]:checked + label::after {
+                content: "";
+                border-radius: 2px;
+                position: absolute;
+                left: 4px;
+                top: 4px;
+                background-color: var(--main-color);
+                transition: filter 0.15s ease;
+                height: 12px;
+                width: 12px;
+            }
+
+            input[type="checkbox"]:hover + label::after,
+            input[type="checkbox"]:focus + label::after {
+                filter: brightness(110%);
+            }
+
+            button {
+                background-color: var(--main-color);
+                color: white;
+                border: none;
+                cursor: pointer;
+                font-weight: bold;
+                padding: 10px;
+                transition:
+                    filter 0.15s ease,
+                    outline 0.03s ease;
+                border-radius: 6px;
+                box-shadow: 0 2px 4px hsla(0, 0%, 0%, 0.1);
+            }
+
+            button:hover,
+            button:focus {
+                filter: brightness(110%);
+            }
+
+            #configureShortcutsButton {
+                background-color: white;
+                color: var(--secondary-color);
+                border-style: solid;
+                border-width: 2px;
+                border-color: var(--tertiary-color);
+                transition:
+                    border-color 0.15s ease,
+                    outline 0.03s ease;
+                filter: unset;
+            }
+
+            #configureShortcutsButton:hover,
+            #configureShortcutsButton:focus {
+                border-color: var(--main-color);
+            }
+
+            hr {
+                border: 0;
+                height: 2px;
+                width: 100%;
+                background: var(--tertiary-color);
+            }
+
+            details {
+                font-size: 14px;
+                font-weight: 500;
+                color: hsl(0, 0%, 40%);
+                display: flex;
+                flex-direction: column;
+                align-items: start;
+                margin: 0 0 10px 10px;
+            }
+
+            details summary {
+                cursor: pointer;
+            }
+
+            #openTests {
+                color: var(--secondary-color);
+                display: inline-block;
+                font-size: 12px;
+                text-decoration: underline;
+                cursor: pointer;
+                transition:
+                    color 0.15s ease,
+                    outline 0.03s ease;
+                border-radius: 4px;
+            }
+
+            #openTests:hover,
+            #openTests:focus {
+                color: hsl(193, 100%, 45%);
+            }
+
+            #debugModeWrapper {
+                padding: 15px 0 10px;
+                height: 20px;
+            }
+        </style>
+        <script src="popup.js" defer></script>
+    </head>
+    <body>
+        <p id="warning">
+            The extension cannot run on this page due to Chrome's restrictions.
+        </p>
+
+        <div id="customTitleWrapper">
+            <label for="customTitleInput">Custom Tab Title</label>
+            <input
+                type="text"
+                id="customTitleInput"
+            />
+            <button id="setTitleButton" type="button">Set Title</button>
+        </div>
+
+        <button id="resetTitleButton" type="button">Reset Title</button>
+
+        <div id="maintainWrapper">
+            <input type="checkbox" id="maintainCheckbox" />
+            <label for="maintainCheckbox">Maintain on navigation</label>
+        </div>
+
+        <hr />
+
+        <button id="configureShortcutsButton">Configure Shortcuts</button>
+
+        <details>
+            <summary>Developer Options</summary>
+            <div id="debugModeWrapper">
+                <input type="checkbox" id="debugModeCheckbox" />
+                <label for="debugModeCheckbox">Debug Mode</label>
+            </div>
+            <a href="tests/tests.html" target="_blank" id="openTests"
+                >Open tests</a
+            >
+        </details>
+    </body>
+</html>
