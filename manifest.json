@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "Custom Tab Title",
-    "version": "1.0",
+    "version": "1.0.1",
     "description": "Change and maintain custom tab titles",
     "permissions": ["storage", "scripting", "tabs"],
     "host_permissions": ["<all_urls>"],
@@ -34,9 +34,6 @@
             "matches": ["<all_urls>"]
         }
     ],
-    "externally_connectable": {
-        "matches": ["*://*/*"]
-    },
     "commands": {
         "set_custom_title": {
             "suggested_key": {

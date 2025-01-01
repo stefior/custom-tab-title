@@ -157,16 +157,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     }
 });
 
-// Accept pings from the injected Title Override script to detect if the
-// extension is active so it can clean up otherwise
-chrome.runtime.onMessageExternal.addListener(
-    (message, sender, sendResponse) => {
-        if (message.action === "ping") {
-            sendResponse(true);
-        }
-    },
-);
-
 function createCustomTitleModal(tabId) {
     const existingModal = document.getElementById("customTitleModalContainer");
     if (existingModal) {

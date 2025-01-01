@@ -11,7 +11,6 @@
     let customTitle = null;
     let originalTitle = null;
     let pageTitle = document.title;
-    let extensionId;
 
     function log(...args) {
         if (!debugMode) return;
@@ -276,48 +275,7 @@
             debugMode = newDebugMode;
             log("Debug mode", newDebugMode ? "enabled" : "disabled");
         }
-
-        if (!extensionId && event.data.extensionId) {
-            extensionId = event.data.extensionId;
-            log("Extension ID received:", extensionId);
-
-            // Periodically check if the extension has been disabled.
-            // If so, clean up until it is enabled again with a set custom title
-            setInterval(() => {
-                if (customTitle === null) return;
-                try {
-                    chrome.runtime.sendMessage(
-                        extensionId,
-                        { action: "ping" },
-                        (response) => {
-                            if (response) {
-                                //console.log("[Title Override] Ping from background:", response);
-                            } else {
-                                //console.log(
-                                //"[Title Override] Background script not found, cleaning up until re-enabled",
-                                //);
-                                customTitle = null;
-                                debugMode = false;
-                                ourTitleElement.textContent = pageTitle;
-                            }
-                        },
-                    );
-                } catch (error) {
-                    //console.log(
-                    //"[Title Override] Background script not found, cleaning up until re-enabled",
-                    //);
-                    customTitle = null;
-                    debugMode = false;
-                    ourTitleElement.textContent = pageTitle;
-                }
-            }, 1000);
-        }
     });
 
     log("Title override script fully initialized");
-
-    // To indicate it is in the iframe on the test page
-    if (window.self !== window.top) {
-        document.documentElement.style.backgroundColor = "lightblue";
-    }
 })();

@@ -56,10 +56,11 @@ function setupFallback() {
         } catch (error) {
             log("[Fallback] Background script not found, cleaning up");
             observer.disconnect();
-            document.title = pageTitle;
+            // Purposely not changing the title back to the original in this
+            // situation just in case it is a false alarm somehow.
             clearInterval(checkIfExtensionEnabled);
         }
-    }, 1000);
+    }, 2000);
 }
 
 function injectCustomTitleScript() {
@@ -98,7 +99,6 @@ function updateTitleOverrideScript(title, debugMode) {
         originalTitle,
         customTitle: title,
         debugMode,
-        extensionId: chrome.runtime.id,
     };
     log("Sending updateTitleOverrideScript WINDOW message:", message);
     window.postMessage(message, "*");
